@@ -211,4 +211,846 @@
     ![image.png](/images/React%20with%20SpringBoot/image%2031.png)
     
 
-- We can also set the type of props our component can accept using PropTypes
+- We can also set the type of props our component can accept using PropTypes, also the default value can be set
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2032.png)
+    
+
+## Creating a single count for multiple counterbuttons
+
+- Up until now, we have multiple count values and for each count value we have a separate increment button, and decrement button.
+- Now, we want that all of these buttons changes the value of a single count.
+- To do that we have to move our state up.
+- We would create a new component in our Counter.jsx named Counter, and rename the already existing Counter() function to CounterButton. Now instead of returning the CounterButtons from App.js we would return them from Counter
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2033.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2034.png)
+    
+- Now we want a single count value, so we would remove the useState() function from CounterButton, also remove the <span> which returns the count and use them in our Counter
+- Now, we would have to create functions for incrementing and decrementing the values in Counter() component. And when we are returning the <CounterButton /> we would have to specify them as props
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2035.png)
+    
+- Now we have a counter application, with single count and multiple buttons
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2036.png)
+    
+- But as we saw earlier, every component must be in separate module. So we would create a new module for our CounterButton component
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2037.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2038.png)
+    
+
+## Adding a Reset Button
+
+- Adding a reset button should be easy, as we just need to return an additional button from the Counter component. Also we would need to create a function which would be called when the button is clicked, and it would set our count to 0
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2039.png)
+    
+
+## Calling Parent Component Functions Directly to our Child Component
+
+- Right now, when we want to call incrementMethod() or decrementMethod() in our CounterButton component, we are making new functions, and calling them in those new functions.
+- But we can use arrow functions to call our parent component functions directly in our child component.
+- 
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2040.png)
+    
+
+# Building Java Todo Full Stack Application With Springboot and React
+
+- 
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2041.png)
+    
+
+- These are the steps involved in building the entire todo app
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2042.png)
+    
+
+- Lets start by creating a login and welcome components.
+- A simple login component can be created using this (Here we have not yet made a new module for Login Component but we will make one later)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2043.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2044.png)
+    
+    ```jsx
+    import { useState } from 'react'
+    import './TodoApp.css'
+    
+    export default function TodoApp(){
+        return(
+            <div className="TodoApp">
+                <Login /> 
+            </div>
+        )
+    }
+    
+    function Login(){
+    
+        const [username, setUsername] = useState('abhiraj')     
+        const [password, setPassword] = useState()              
+    
+        function handleUsernameChange(event){
+            setUsername(event.target.value)                     
+        }
+    
+        function handlePasswordChange(event){
+            setPassword(event.target.value)
+        }
+    
+        return(
+            <div className="Login">
+                <div className="LoginForm">
+                    <div>
+                        <label>Username: </label>
+                         <input type="text" name="username" value={username} onChange={handleUsernameChange} />  
+                    </div>
+                    <div>
+                        <label>Password: </label>
+                        <input type="password" name="password" onChange={handlePasswordChange}/>
+                    </div>
+                    <div>
+                        <button type="button" name="login">Submit</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    ```
+    
+
+## Adding Hardcoded Authentication for Login
+
+- First, let us hardcode our authenticated credentials, and if the credentials are right we must print success or failure in console.
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2045.png)
+    
+
+- Now, if we want to print some message on our view then we have to make use of the && operation. For eg: We want to display “Authentication Successful” when the authentication is success, and “Authentication Failed” when it fails.
+    - For that we would need to create 2 more state:
+        1. showSuccessMessage, setShowSuccessMessage: initally false
+        2. showErrorMessage, setShowErrorMessage: initally false
+    - Then we will check about the authentication in our handleSubmit button, and accordingly update the value of these 2 states.
+    - At last, in our login component, we can use the && to let the authentication decide if it shows any message or not.
+        
+        ![image.png](/images/React%20with%20SpringBoot/image%2046.png)
+        
+        ![image.png](/images/React%20with%20SpringBoot/image%2047.png)
+        
+        ![image.png](/images/React%20with%20SpringBoot/image%2048.png)
+        
+        ![image.png](/images/React%20with%20SpringBoot/image%2049.png)
+        
+    
+    ```jsx
+    import { useState } from 'react'
+    import './TodoApp.css'
+    
+    export default function TodoApp(){
+        return(
+            <div className="TodoApp">
+                <Login /> 
+            </div>
+        )
+    }
+    
+    function Login(){
+    
+        const [username, setUsername] = useState('abhiraj')     
+        const [password, setPassword] = useState()        
+        const [showSuccessMessage, setShowSuccessMessage] = useState(false)      
+        const [showErrorMessage, setShowErrorMessage] = useState(false)      
+    
+        function handleUsernameChange(event){
+            setUsername(event.target.value)                     
+        }
+    
+        function handlePasswordChange(event){
+            setPassword(event.target.value)
+        }
+    
+        function handleSubmit(){
+            if(username === 'abhiraj' && password === 'Abhiraj@07'){
+                console.log('correct')
+                setShowSuccessMessage(true)
+                setShowErrorMessage(false)
+            }else{
+                console.log('failed')
+                setShowSuccessMessage(false)
+                setShowErrorMessage(true)
+            }
+        }
+    
+        return(
+            <div className="Login">
+                {showSuccessMessage && <div className='successMessage'>Authenticated Successfully</div>}
+                {showErrorMessage && <div className='errorMessage'>Authentication Failed. Please check your credentials.</div>}  
+                <div className="LoginForm">
+                    <div>
+                        <label>Username: </label>
+                        <input type="text" name="username" value={username} onChange={handleUsernameChange} />  
+                    </div>
+                    <div>
+                        <label>Password: </label>
+                        <input type="password" name="password" onChange={handlePasswordChange}/>
+                    </div>
+                    <div>
+                        <button type="button" name="login" onClick={handleSubmit}>Login</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    ```
+    
+
+## Redirecting to Welcome Component
+
+- Now, the only functionality which is not yet in our Login component is that when the authentication is successful we should be redirected or routed to Welcome component.
+- We want LoginComponent to route to WelcomeComponent, and the component that would allow us to do routing is called React Router DOM
+- To install React Router DOM we would have to use this command in our cmd
+    
+    ```xml
+    npm install react-router-dom
+    ```
+    
+- Now we need to import BrowserRouter, Routes, Route, and useNavigate() from react-router-dom
+    
+    ```jsx
+    import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
+    
+    ```
+    
+- Now we can specify the url at which our components would be present like this:
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2050.png)
+    
+- Also, we want that if the credentials are correct we are redirected to the welcome component, which is now present at ‘/welcome’ so we can use another hook useNavigate which would return a function in which when we pass an url it redirects us to that url
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2051.png)
+    
+- 
+    
+    ```
+    import { useState } from 'react'
+    import './TodoApp.css'
+    import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
+    
+    export default function TodoApp(){
+        return(
+            <div className="TodoApp">
+    
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' element={<LoginComponent />}></Route>
+                        <Route path='/login' element={<LoginComponent />}></Route>
+                        <Route path='/welcome' element={<WelcomeComponent />}></Route>
+                    </Routes>
+                </BrowserRouter>
+    
+            </div>
+        )
+    }
+    
+    function LoginComponent(){
+    
+        const [username, setUsername] = useState('abhiraj')     
+        const [password, setPassword] = useState()        
+        const [showSuccessMessage, setShowSuccessMessage] = useState(false)      
+        const [showErrorMessage, setShowErrorMessage] = useState(false)   
+        
+        const navigate = useNavigate()
+    
+        function handleUsernameChange(event){
+            setUsername(event.target.value)                     
+        }
+    
+        function handlePasswordChange(event){
+            setPassword(event.target.value)
+        }
+    
+        function handleSubmit(){
+            if(username === 'abhiraj' && password === 'Abhiraj@07'){
+                console.log('correct')
+                setShowSuccessMessage(true)
+                setShowErrorMessage(false)
+                navigate('/welcome')
+            }else{
+                console.log('failed')
+                setShowSuccessMessage(false)
+                setShowErrorMessage(true)
+            }
+        }
+    
+        return(
+            <div className="Login">
+                {showSuccessMessage && <div className='successMessage'>Authenticated Successfully</div>}
+                {showErrorMessage && <div className='errorMessage'>Authentication Failed. Please check your credentials.</div>}  
+                <div className="LoginForm">
+                    <div>
+                        <label>Username: </label>
+                        <input type="text" name="username" value={username} onChange={handleUsernameChange} />  
+                    </div>
+                    <div>
+                        <label>Password: </label>
+                        <input type="password" name="password" onChange={handlePasswordChange}/>
+                    </div>
+                    <div>
+                        <button type="button" name="login" onClick={handleSubmit}>Login</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
+    function WelcomeComponent(){
+        return(
+            <div className='Welcome'>
+                Welcome Component
+            </div>
+        )
+    }
+    ```
+    
+
+## Adding Error Components
+
+- Right now when we try to access a url which is not yet routed to any component our application shows a blank page with an error in the console
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2052.png)
+    
+- Instead of this we want to show a proper error component.
+- This is pretty simple, we just need to make an error component and then route it to every url using * and place it as the last route in <Routes>
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2053.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2054.png)
+    
+    ```jsx
+    import { useState } from 'react'
+    import './TodoApp.css'
+    import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
+    
+    export default function TodoApp(){
+        return(
+            <div className="TodoApp">
+    
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' element={<LoginComponent />}></Route>
+                        <Route path='/login' element={<LoginComponent />}></Route>
+                        <Route path='/welcome' element={<WelcomeComponent />}></Route>
+                        <Route path='*' element={<ErrorComponent />}></Route>
+                    </Routes>
+                </BrowserRouter>
+    
+            </div>
+        )
+    }
+    
+    function LoginComponent(){
+    
+        const [username, setUsername] = useState('abhiraj')     
+        const [password, setPassword] = useState()        
+        const [showSuccessMessage, setShowSuccessMessage] = useState(false)      
+        const [showErrorMessage, setShowErrorMessage] = useState(false)   
+        
+        const navigate = useNavigate()
+    
+        function handleUsernameChange(event){
+            setUsername(event.target.value)                     
+        }
+    
+        function handlePasswordChange(event){
+            setPassword(event.target.value)
+        }
+    
+        function handleSubmit(){
+            if(username === 'abhiraj' && password === 'Abhiraj@07'){
+                console.log('correct')
+                setShowSuccessMessage(true)
+                setShowErrorMessage(false)
+                navigate('/welcome')
+            }else{
+                console.log('failed')
+                setShowSuccessMessage(false)
+                setShowErrorMessage(true)
+            }
+        }
+    
+        return(
+            <div className="Login">
+                <h1>Time To LockIn!!</h1>
+                {showSuccessMessage && <div className='successMessage'>Authenticated Successfully</div>}
+                {showErrorMessage && <div className='errorMessage'>Authentication Failed. Please check your credentials.</div>}  
+                <div className="LoginForm">
+                    <div>
+                        <label>Username: </label>
+                        <input type="text" name="username" value={username} onChange={handleUsernameChange} />  
+                    </div>
+                    <div>
+                        <label>Password: </label>
+                        <input type="password" name="password" onChange={handlePasswordChange}/>
+                    </div>
+                    <div>
+                        <button type="button" name="login" onClick={handleSubmit}>Login</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
+    function WelcomeComponent(){
+        return(
+            <div className='Welcome'>
+                <h1>Welcome Abhiraj</h1>
+                <div>
+                    Welcome Component
+                </div>
+            </div>
+        )
+    }
+    
+    function ErrorComponent(){
+        return(
+            <div className='Error'>
+                <h1>We are working really hard!</h1>
+                <div>
+                    Please stay in your limits. 
+                </div>
+            </div>
+        )
+    }
+    ```
+    
+
+## Removing Hardcoded Data from Welcome Component
+
+- Right now, we have hardcoded the name ‘Abhiraj’ in our welcome component
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2055.png)
+    
+- What we want is that the username which was specified at the time of login to be used.
+- For that we have to use another hook useParams() which would return a key:value pair where value would be the thing we want to capture.
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2056.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2057.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2058.png)
+    
+- Even here, we have somehow hardcode the name ‘abhiraj’ and not using it from the login form. To use it from the login, we can pass the variable (state) username in the navigate() function. And to pass a variable alongside a string in JavaScript we use ` ` instead of ' '
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2059.png)
+    
+    ```jsx
+    import { useState } from 'react'
+    import './TodoApp.css'
+    import { BrowserRouter, Route, Routes, useNavigate, useParams } from 'react-router-dom'
+    
+    export default function TodoApp(){
+        return(
+            <div className="TodoApp">
+    
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' element={<LoginComponent />}></Route>
+                        <Route path='/login' element={<LoginComponent />}></Route>
+                        <Route path='/welcome/:username' element={<WelcomeComponent />}></Route>        {/* the keyword we specify here becomes the key of useParams() */}
+                        <Route path='*' element={<ErrorComponent />}></Route>
+                    </Routes>
+                </BrowserRouter>
+    
+            </div>
+        )
+    }
+    
+    function LoginComponent(){
+    
+        const [username, setUsername] = useState('abhiraj')     
+        const [password, setPassword] = useState()        
+        const [showSuccessMessage, setShowSuccessMessage] = useState(false)      
+        const [showErrorMessage, setShowErrorMessage] = useState(false)   
+        
+        const navigate = useNavigate()
+    
+        function handleUsernameChange(event){
+            setUsername(event.target.value)                     
+        }
+    
+        function handlePasswordChange(event){
+            setPassword(event.target.value)
+        }
+    
+        function handleSubmit(){
+            if(username === 'abhiraj' && password === 'Abhiraj@07'){
+                console.log('correct')
+                setShowSuccessMessage(true)
+                setShowErrorMessage(false)
+                navigate(`/welcome/${username}`)        //what we pass in here becomes the value of the useParams()
+            }else{
+                console.log('failed')
+                setShowSuccessMessage(false)
+                setShowErrorMessage(true)
+            }
+        }
+    
+        return(
+            <div className="Login">
+                <h1>Time To LockIn!!</h1>
+                {showSuccessMessage && <div className='successMessage'>Authenticated Successfully</div>}
+                {showErrorMessage && <div className='errorMessage'>Authentication Failed. Please check your credentials.</div>}  
+                <div className="LoginForm">
+                    <div>
+                        <label>Username: </label>
+                        <input type="text" name="username" value={username} onChange={handleUsernameChange} />  
+                    </div>
+                    <div>
+                        <label>Password: </label>
+                        <input type="password" name="password" onChange={handlePasswordChange}/>
+                    </div>
+                    <div>
+                        <button type="button" name="login" onClick={handleSubmit}>Login</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
+    function WelcomeComponent(){
+    
+        const {username} = useParams()  //Here we have deconstruted our object so that whatever value was present in 'username' key would be stored here
+    
+        return(
+            <div className='Welcome'>
+                <h1>Welcome {username}</h1>
+                <div>
+                    Welcome Component
+                </div>
+            </div>
+        )
+    }
+    
+    function ErrorComponent(){
+        return(
+            <div className='Error'>
+                <h1>We are working really hard!</h1>
+                <div>
+                    Please stay in your limits. 
+                </div>
+            </div>
+        )
+    }
+    ```
+    
+
+## Creating ListTodosComponent
+
+- Let us first create an array of Todos for simplicity.
+- The map() function in JavaScript creates a separate array for the same fields of a given array. For eg: If we have an array arr with every element having 2 fields. Then map() would create 2 new arrays for each field values for all elements of the array
+- 
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2060.png)
+    
+    ```jsx
+    import { useState } from 'react'
+    import './TodoApp.css'
+    import { BrowserRouter, Route, Routes, useNavigate, useParams } from 'react-router-dom'
+    
+    export default function TodoApp(){
+        return(
+            <div className="TodoApp">
+    
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' element={<LoginComponent />} />
+                        <Route path='/login' element={<LoginComponent />} />
+                        <Route path='/welcome/:username' element={<WelcomeComponent />} />  
+                        <Route path='/todos' element={<ListTodosComponent />} />
+                        <Route path='*' element={<ErrorComponent />} />
+                    </Routes>
+                </BrowserRouter>
+    
+            </div>
+        )
+    }
+    
+    function LoginComponent(){
+    
+        const [username, setUsername] = useState('abhiraj')     
+        const [password, setPassword] = useState()        
+        const [showSuccessMessage, setShowSuccessMessage] = useState(false)      
+        const [showErrorMessage, setShowErrorMessage] = useState(false)   
+        
+        const navigate = useNavigate()
+    
+        function handleUsernameChange(event){
+            setUsername(event.target.value)                     
+        }
+    
+        function handlePasswordChange(event){
+            setPassword(event.target.value)
+        }
+    
+        function handleSubmit(){
+            if(username === 'abhiraj' && password === 'Abhiraj@07'){
+                console.log('correct')
+                setShowSuccessMessage(true)
+                setShowErrorMessage(false)
+                navigate(`/welcome/${username}`)        //what we pass in here becomes the value of the useParams()
+            }else{
+                console.log('failed')
+                setShowSuccessMessage(false)
+                setShowErrorMessage(true)
+            }
+        }
+    
+        return(
+            <div className="Login">
+                <h1>Time To LockIn!!</h1>
+                {showSuccessMessage && <div className='successMessage'>Authenticated Successfully</div>}
+                {showErrorMessage && <div className='errorMessage'>Authentication Failed. Please check your credentials.</div>}  
+                <div className="LoginForm">
+                    <div>
+                        <label>Username: </label>
+                        <input type="text" name="username" value={username} onChange={handleUsernameChange} />  
+                    </div>
+                    <div>
+                        <label>Password: </label>
+                        <input type="password" name="password" onChange={handlePasswordChange}/>
+                    </div>
+                    <div>
+                        <button type="button" name="login" onClick={handleSubmit}>Login</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
+    function WelcomeComponent(){
+    
+        const {username} = useParams()  //Here we have deconstruted our object so that whatever value was present in 'username' key would be stored here
+    
+        return(
+            <div className='Welcome'>
+                <h1>Welcome {username}</h1>
+                <div>
+                    Welcome Component
+                </div>
+            </div>
+        )
+    }
+    
+    function ErrorComponent(){
+        return(
+            <div className='Error'>
+                <h1>We are working really hard!</h1>
+                <div>
+                    Please stay in your limits. 
+                </div>
+            </div>
+        )
+    }
+    
+    function ListTodosComponent(){
+    
+        const todos = [ {id:1, description: 'Learn AWS'},
+                        {id:2, description: 'Learn React'},
+                        {id:3, description: 'Learn Docker'},
+                        {id:4, description: 'Learn MySQL'},
+                        {id:5, description: 'Learn ThymeLeaf'},
+                        ]
+    
+        return(
+            <div className='ListTodosComponent'>
+                <h1>Things You Need To Do!!</h1>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Id</td>
+                                <td>Description</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {   
+                                todos.map(                      //The todos.map() function in JavaScript creates a separate array for the elements of todos 
+                                    todo => (
+                                        <tr key={todo.id}>          
+                                            <td>{todo.id}</td>
+                                            <td>{todo.description}</td>
+                                        </tr>
+                                    )
+                                )
+                            }
+    
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        )
+    }
+    ```
+    
+
+- Now let us add a Done and Target Date fields as well.
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2061.png)
+    
+
+- Now we want to add a link to our welcome component which would redirect us to our todos component. We can easily do that using the <a> tag in html. But if we use <a> tag then the entire page is refreshed when we get redirected. And it is not a good practice since, we are using React and if our entire webpage is being refreshed then we are not making full use of React.
+- Instead of <a href=””> we can use <Link to=””> which is provided to us by react-router-dom
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2062.png)
+    
+    ```jsx
+    import { useState } from 'react'
+    import './TodoApp.css'
+    import { BrowserRouter, Link, Route, Routes, useNavigate, useParams } from 'react-router-dom'
+    
+    export default function TodoApp(){
+        return(
+            <div className="TodoApp">
+    
+                <BrowserRouter>
+                    <Routes>
+                        <Route path='/' element={<LoginComponent />} />
+                        <Route path='/login' element={<LoginComponent />} />
+                        <Route path='/welcome/:username' element={<WelcomeComponent />} />  
+                        <Route path='/todos' element={<ListTodosComponent />} />
+                        <Route path='*' element={<ErrorComponent />} />
+                    </Routes>
+                </BrowserRouter>
+    
+            </div>
+        )
+    }
+    
+    function LoginComponent(){
+    
+        const [username, setUsername] = useState('abhiraj')     
+        const [password, setPassword] = useState()        
+        const [showSuccessMessage, setShowSuccessMessage] = useState(false)      
+        const [showErrorMessage, setShowErrorMessage] = useState(false)   
+        
+        const navigate = useNavigate()
+    
+        function handleUsernameChange(event){
+            setUsername(event.target.value)                     
+        }
+    
+        function handlePasswordChange(event){
+            setPassword(event.target.value)
+        }
+    
+        function handleSubmit(){
+            if(username === 'abhiraj' && password === 'Abhiraj@07'){
+                console.log('correct')
+                setShowSuccessMessage(true)
+                setShowErrorMessage(false)
+                navigate(`/welcome/${username}`)        //what we pass in here becomes the value of the useParams()
+            }else{
+                console.log('failed')
+                setShowSuccessMessage(false)
+                setShowErrorMessage(true)
+            }
+        }
+    
+        return(
+            <div className="Login">
+                <h1>Time To LockIn!!</h1>
+                {showSuccessMessage && <div className='successMessage'>Authenticated Successfully</div>}
+                {showErrorMessage && <div className='errorMessage'>Authentication Failed. Please check your credentials.</div>}  
+                <div className="LoginForm">
+                    <div>
+                        <label>Username: </label>
+                        <input type="text" name="username" value={username} onChange={handleUsernameChange} />  
+                    </div>
+                    <div>
+                        <label>Password: </label>
+                        <input type="password" name="password" onChange={handlePasswordChange}/>
+                    </div>
+                    <div>
+                        <button type="button" name="login" onClick={handleSubmit}>Login</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    
+    function WelcomeComponent(){
+    
+        const {username} = useParams()  
+    
+        return(
+            <div className='Welcome'>
+                <h1>Welcome {username}</h1>
+                <div>
+                    <Link to='/todos'> Manage </Link>Your Todos!
+                </div>
+            </div>
+        )
+    }
+    
+    function ErrorComponent(){
+        return(
+            <div className='Error'>
+                <h1>We are working really hard!</h1>
+                <div>
+                    Please stay in your limits. 
+                </div>
+            </div>
+        )
+    }
+    
+    function ListTodosComponent(){
+    
+        const today = new Date()
+        const targetDate = new Date(today.getFullYear()+1, today.getMonth(), today.getDay())
+    
+        const todos = [ {id:1, description: 'Learn AWS', done: false, targetDate: targetDate},
+                        {id:2, description: 'Learn React', done: false, targetDate: targetDate},
+                        {id:3, description: 'Learn Docker', done: false, targetDate: targetDate}
+                        ]
+    
+        return(
+            <div className='ListTodosComponent'>
+                <h1>Things You Need To Do!!</h1>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Id</td>
+                                <td>Description</td>
+                                <td>Is Done?</td>
+                                <td>Target Date</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {   
+                                todos.map(                     
+                                    todo => (
+                                        <tr key={todo.id}>          
+                                            <td>{todo.id}</td>
+                                            <td>{todo.description}</td>
+                                            <td>{todo.done.toString()}</td>
+                                            <td>{todo.targetDate.toDateString()}</td>
+                                        </tr>
+                                    )
+                                )
+                            }
+    
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        )
+    }
+    ```
