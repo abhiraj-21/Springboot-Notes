@@ -905,7 +905,7 @@
     
 
 - Now we want to add a link to our welcome component which would redirect us to our todos component. We can easily do that using the <a> tag in html. But if we use <a> tag then the entire page is refreshed when we get redirected. And it is not a good practice since, we are using React and if our entire webpage is being refreshed then we are not making full use of React.
-- Instead of <a href=””> we can use <Link to=””> which is provided to us by react-router-dom
+- Instead of `<a href=””>` we can use `<Link to=””>` which is provided to us by react-router-dom
     
     ![image.png](/images/React%20with%20SpringBoot/image%2062.png)
     
