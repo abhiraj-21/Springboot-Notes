@@ -1475,3 +1475,384 @@
     ![image.png](/images/React%20with%20SpringBoot/image%2087.png)
     
     ![image.png](/images/React%20with%20SpringBoot/image%2088.png)
+    
+
+## Connect React With Todo REST-API
+
+- Lets us first start with creating a REST-API for retrieving Todos for a user. We have these beans present in our file as of now:
+    
+    ```java
+    package com.in28minutes.rest.webservices.restful_web_services.todo;
+    
+    import java.time.LocalDate;
+    
+    public class Todo {
+    
+    	public Todo() {
+    
+    	}
+    
+    	public Todo(int id, String username, String description, LocalDate targetDate, boolean done) {
+    		super();
+    		this.id = id;
+    		this.username = username;
+    		this.description = description;
+    		this.targetDate = targetDate;
+    		this.done = done;
+    	}
+    
+    	private int id;
+    
+    	private String username;
+    
+    	private String description;
+    	private LocalDate targetDate;
+    	private boolean done;
+    
+    	public int getId() {
+    		return id;
+    	}
+    
+    	public void setId(int id) {
+    		this.id = id;
+    	}
+    
+    	public String getUsername() {
+    		return username;
+    	}
+    
+    	public void setUsername(String username) {
+    		this.username = username;
+    	}
+    
+    	public String getDescription() {
+    		return description;
+    	}
+    
+    	public void setDescription(String description) {
+    		this.description = description;
+    	}
+    
+    	public LocalDate getTargetDate() {
+    		return targetDate;
+    	}
+    
+    	public void setTargetDate(LocalDate targetDate) {
+    		this.targetDate = targetDate;
+    	}
+    
+    	public boolean isDone() {
+    		return done;
+    	}
+    
+    	public void setDone(boolean done) {
+    		this.done = done;
+    	}
+    
+    	@Override
+    	public String toString() {
+    		return "Todo [id=" + id + ", username=" + username + ", description=" + description + ", targetDate="
+    				+ targetDate + ", done=" + done + "]";
+    	}
+    
+    }
+    ```
+    
+    ```java
+    package com.in28minutes.rest.webservices.restful_web_services.todo;
+    
+    import java.time.LocalDate;
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.function.Predicate;
+    
+    import org.springframework.stereotype.Service;
+    
+    @Service
+    public class TodoService {
+    	
+    	private static List<Todo> todos = new ArrayList<>();
+    	
+    	private static int todosCount = 0;
+    	
+    	static {
+    		todos.add(new Todo(++todosCount, "in28minutes","Get AWS Certified", 
+    							LocalDate.now().plusYears(10), false ));
+    		todos.add(new Todo(++todosCount, "in28minutes","Learn DevOps", 
+    				LocalDate.now().plusYears(11), false ));
+    		todos.add(new Todo(++todosCount, "in28minutes","Learn Full Stack Development", 
+    				LocalDate.now().plusYears(12), false ));
+    	}
+    	
+    	public List<Todo> findByUsername(String username){
+    		Predicate<? super Todo> predicate = 
+    				todo -> todo.getUsername().equalsIgnoreCase(username);
+    		return todos.stream().filter(predicate).toList();
+    	}
+    	
+    	public Todo addTodo(String username, String description, LocalDate targetDate, boolean done) {
+    		Todo todo = new Todo(++todosCount,username,description,targetDate,done);
+    		todos.add(todo);
+    		return todo;
+    	}
+    	
+    	public void deleteById(int id) {
+    		Predicate<? super Todo> predicate = todo -> todo.getId() == id;
+    		todos.removeIf(predicate);
+    	}
+    
+    	public Todo findById(int id) {
+    		Predicate<? super Todo> predicate = todo -> todo.getId() == id;
+    		Todo todo = todos.stream().filter(predicate).findFirst().get();
+    		return todo;
+    	}
+    
+    	public void updateTodo(Todo todo) {
+    		deleteById(todo.getId());
+    		todos.add(todo);
+    	}
+    }
+    ```
+    
+
+### Creating and calling Retrieve All Todos REST-API
+
+- Now we want to create a Controller, and in that we have to map a function to the url “/users/{username}/todos”
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2089.png)
+    
+
+- Now, we want to use this data we retrieved from REST-API to be used in our listtodos component. For that we would have to first create a TodoApiService.js file in the api folder. Then we can import the apiClient since our base url from both HelloWorldApiSevice and TodoApiService is same. Then we would create a function which would be used to call the api retrieveTodos
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2090.png)
+    
+- Now, in our listtodos component where we have been hardcoding some todos data in an array we should remove that. And instead create a state of todos and setTodos with the default as an empty array.
+- Then we would create a function which would call out retrieveAllTodosForUsername function and for now we would pass our hardcoded username, and again define then() catch() and finally() methods.
+- Now, we don’t want that this rest api should only be called when a button or something else is clicked. And hence we would use a hook useEffect() which would automatically the function passed inside (as an arrow function) until a condition is satisified
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2091.png)
+    
+
+### Creating and Calling Retrieve a Specific Todo and Delete Todo REST-API
+
+- Retrieve Todo: @GetMapping(“/users/{username}/todos/{id}”)
+- Delete Todo: @DeleteMapping(“/users/{username}/todos/{id}”)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2092.png)
+    
+
+ 
+
+- Now for delete we would have to first create a button for every todo present in our table, so that if the button is clicked the todo is deleted.
+- After we have created a button, we would have to make a function which would call our deleteTodo api, but instead of get we would be using delete in our TodoApiService as the method type here is Delete
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2093.png)
+    
+- Now we can create a function which would call this function, and in the then() function of it we would again call refreshTodo() (which calls our retrieveAllTodosForUsername api) since our todos have been updated now.
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2094.png)
+    
+    ```jsx
+    import { deleteTodoApi, retrieveAllTodosForUsernameApi } from "./api/TodoApiService"
+    import { useEffect, useState } from "react"
+    
+    export default function ListTodosComponent(){
+    
+        const [todos, setTodos] = useState([])
+    
+        const [message, setMessage] = useState(null)
+    
+        useEffect(                      
+            () => refreshTodos(), [] 
+        )
+    
+        function refreshTodos(){
+            retrieveAllTodosForUsernameApi('abhiraj')
+            .then(
+                (response) => {setTodos(response.data)  
+                                console.log(response.data)
+                }
+            )
+            .catch((error)=>console.log(error))
+            .finally(() => console.log('cleanup'))
+        }
+    
+        function deleteTodo(id){
+            deleteTodoApi('abhiraj',id)
+            .then(
+                (response) => {
+                    refreshTodos()
+                    setMessage(`Todo ${id} Deleted`)
+                }
+            )
+            .catch(
+                (error) => console.log(error)
+            )
+        }
+    
+        return(
+            <div className='container'>
+                <h1>Things You Need To Do!!</h1>
+                {message && <div className="alert alert-warning">{message}</div>}
+                <div>
+                    <table className='table'>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Is Done?</th>
+                                <th>Target Date</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {   
+                                todos.map(                     
+                                    todo => (
+                                        <tr key={todo.id}>
+                                            <td>{todo.description}</td>
+                                            <td>{todo.done.toString()}</td>
+                                             <td>{todo.targetDate.toString()}</td>        {/* This is how we pass parameters in onClick        */}
+                                             <td><button className="btn btn-warning" onClick={() => deleteTodo(todo.id)}>Delete</button></td>
+                                        </tr>
+                                    )
+                                )
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        )
+    }
+    ```
+    
+
+### Calling Retrieve Todo REST-API and Displaying it using React
+
+- It would have these steps
+    1. Create a component which would be used to display the existing details about a todo
+    2. Enable the logic to change the details about the todo
+    3. Display the fields on webpage
+
+ 
+
+- We can create a TodoComponent like this, and then include it in our TodoApp component, and remember to put it in AuthenticatedRoute
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2095.png)
+    
+    Here we have already made a function which calls the retrieveTodo api from our springboot application
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2096.png)
+    
+
+- Now if we check our console we could see that it returns a Todo bean
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2097.png)
+    
+    So if we want to change the details we would need to make use of states of those specific attributes. 
+    
+- Now we want a form to be visible in this page so that we are able to change the values. For the form we would use Formik, and since we want that we should be able to change targetDate we would be using Moment. Both of them are framework used for their specific tasks.
+    
+    ```xml
+    npm install formik
+    npm install moment
+    ```
+    
+- Inside the <Formik></Formik> tag we would return the function which contains the jsx we want to return back. Basically the function which contains the form jsx
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2098.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%2099.png)
+    
+    ```jsx
+    import { useEffect, useState } from "react"
+    import { retrieveTodoApi } from "./api/TodoApiService"
+    import { useAuth } from "./security/AuthContext"
+    import { useParams } from "react-router-dom"
+    import { ErrorMessage, Field, Form, Formik } from "formik"
+    
+    export default function Todo(){
+    
+        const authContext = useAuth()
+        const {id} = useParams()
+    
+        const [description, setDescription] = useState('')
+        
+        const [targetDate, setTargetDate] = useState('')
+    
+        useEffect(
+            () => retrieveTodo(), [id]
+        )
+    
+        function retrieveTodo(){
+            retrieveTodoApi(authContext.username, id)
+            .then( response => {
+                                setDescription(response.data.description)
+                                setTargetDate(response.data.targetDate)
+            })
+            .catch((error) => console.log(error))
+        }
+    
+        function onSubmit(values){                  //Formik returns values 
+            setDescription(values.description)
+            setTargetDate(values.targetDate)
+        }
+    
+        function validate(values){                                  
+            const error = {}
+            if(values.description.length < 5){                      //Here we are adding the validation if the length of the description is less than 5 characters
+                error.description = 'Enter atleast 5 characters'
+            }
+            console.log(values)
+            return error
+        }
+    
+        return(
+            <div className="container">
+                <h1>Enter Todo Details</h1>
+                <div> 
+                    
+                    <Formik 
+                        initialValues={ { description, targetDate } } enableReinitialize={true}     //These 2 tags are used to set the initial values 
+                        onSubmit={onSubmit}     //This onSubmit would call a function onSubmit when the button of type 'Submit' is clicked
+                        validate={validate} validateOnChange={false} validateOnBlur={false}         //These are used for validations
+                    >
+                        {
+                            (props) => (        //Formik requires props 
+                                <Form>
+                                    
+                                    <ErrorMessage               //This is used to display the error message when the validation fails
+                                        name="description"      //This is used to define which validation failure if occurs this should be called
+                                        component="div"
+                                        className="alert alert-warning"
+                                    />
+                                    
+                                    <ErrorMessage 
+                                        name="targetDate"
+                                        component="div"
+                                        className="alert alert-warning"
+                                    />
+    
+                                    <fieldset className="form-group">          {/*  Every Label and input must be within a fieldset */}
+                                        <label>Description</label>
+                                        <Field type="text" className="form-control" name="description" />       {/* Field is the same as input */}
+                                    </fieldset>
+    
+                                    <fieldset className="form-group">
+                                        <label>Target Date</label>
+                                        <Field type="date" className="form-control" name="targetDate" />
+                                    </fieldset>
+    
+                                    <div>
+                                        <button className="btn btn-success m-3" type="submit">Save</button>
+                                    </div>
+                                </Form>
+                            ) 
+                        }
+                    </Formik>
+    
+                </div>
+            </div>
+        )
+    }
+    ```
