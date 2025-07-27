@@ -1856,3 +1856,183 @@
         )
     }
     ```
+    
+
+### Creating and Calling UpdateTodo and CreateTodo REST-API
+
+- Here we have created the methods for these 2 apis
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20100.png)
+    
+
+- Now to call and make our UpdateTodo rest api perform its task, we would need to change the onSubmit function in our TodoComponent. The onSubmit() function right now handles the task which shouls be done when the save is clicked, and we want that when the save is clicked the todo gets updated with our new values and we redirect to the listTodo component
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20101.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20102.png)
+    
+
+- Now for the Create Todo API, we would first create a button in our ListTodoComponent which when click would take us to TodoComponent. But if we directly did this, we would have some errors, since right now when we navigate to TodoComponent the retrieveTodo() function requires an id from which it takes the default values for our update todo api. So we would create a new function that would be called when the Add New Todo button is created, and it won’t take any parameters. But for navigating we still need an id, so we would hardcode ‘-1’ for now, and in the retrieveTodo() function we would say that only show the default values if the id≠-1
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20103.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20104.png)
+    
+
+- And since we are on the same page which have the onSubmit function calling the updateTodoApi we can say that if the id is -1 then call createTodoApi else call updateTodoApi, and the todo structure remains the same
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20105.png)
+    
+
+### Authorizing our REST-APIs using Spring Security
+
+- Here we are just using what we have already used in our REST-API and Fullstack development sections
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20106.png)
+    
+- The only thing we have used new here is making our REST-APIs Stateless using this line of code
+    
+    ```java
+    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    ```
+    
+
+### Adding Authorization Header to our Frontend to call REST-APIs
+
+- Right now, after we have used spring security to authorize our REST-API, if we try to call them from our application we would see an error stating that the CORS policy has blocked the call
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20107.png)
+    
+- We can create a header in the component we need to call the rest api from. Lets start with the Hello World rest-api call which is present in our WelcomeComponent
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20108.png)
+    
+    We get this header authorization value from TalendApi Tester, where we passed our authorized username and password as header 
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20109.png)
+    
+- And now if we click on the button that calls the rest-api then we would see a new error stating Preflight request doesn’t pass access control
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20110.png)
+    
+- This new error occurs because, when we click the button for calling rest api, the preflight call occurs first which have the RequestMethod of the type OPTIONS. So we would have to enable access to OPTIONS request methods for all components
+- Right now, we are hardcoding the header from our Api Tester. But we need that the header is generated when we login from our LoginComponent, then the credentials are checked in the REST-API and if the credentials are correct, then the header authorization is generated and used. This is called Test Request, when frontend shares the data to backend to check if the authorization is correct or not.If the authorization is correct REST-API returns a token, we would then store the token in our Context, and then whenever needed use it in our application
+- We would create a basicauth url. The token generated in LoginComponent is sent to this basicauth url, and if the response of this is 200 then the token is valid and would be able to call other apis
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20111.png)
+    
+- Now, we want to permit all the urls to access the OPTIONS RequestMethod
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20112.png)
+    
+- And now if we call the HelloWorld rest api from our welcome component, it would give us the data back
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20113.png)
+    
+- Now we will shift our focus to change the hardcoded header authorization. We want to catch the header when we try to login from our LoginComponent.
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20114.png)
+    
+    Here we can see that the LoginComponent is calling AuthContext login function. So we would need to generate the token there.
+    
+- We would call the basicauth api from our context, and generate a token with the entered username and password. To generate token this exact code should be present
+    
+    ```jsx
+    const baToken = "Basic " + window.btoa(username + ":" + password)
+    ```
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20115.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20116.png)
+    
+    Here, for now we are logging success (returned in our api) if the token is correct, and if the token (credentials) are incorrect then there would be the same preflight error
+    
+
+- When we call api then it returns a promise back. It means that the function does not stop executing the lines present after the api call until the call happens. So if we want to return true if the token is correct, we cannot do it like this because the api call wouldn’t stop the condition to be checked even if it does not have a response, hence we would have to use async function
+- And when we make a function async function, then we can call await for the api call so that until a response is returned the function would be on hold.
+- Now if there is any other function which is calling this async function, that function needs to be async as well. And the function call should be await. Meaning our login() function in context is now async, and the handleSubmit() function in our LoginComponent is calling this function. Hence it should be async as well
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20117.png)
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20118.png)
+    
+    ```jsx
+    import { createContext, useContext, useState } from "react";
+    import { executeBasicAuthenticationService } from "../api/HelloWorldApiService";
+    
+    export const AuthContext = createContext()
+    
+    export const useAuth = () => useContext(AuthContext)
+    
+    export default function AuthProvider({ children }){
+        
+        const [isAuthenticated, setAuthenticated] = useState(false)     
+    
+        const [username, setUsername] = useState(null)
+    
+        const [token, setToken] = useState()
+    
+        async function login(username, password){
+    
+            const baToken = "Basic " + window.btoa(username + ":" + password)
+    
+            try{
+                const response = await executeBasicAuthenticationService(baToken)
+        
+                if(response.status == 200){
+                    setUsername(username)
+                    setAuthenticated(true)
+                    setToken(baToken)
+                    return true
+                }else{
+                    logout()
+                    return false
+                }
+            }catch(error){
+                logout()
+                return false
+            }
+            
+            
+        }
+        
+        function logout(){
+            setUsername(null)
+            setAuthenticated(false)
+            setToken(null)
+        }
+    
+        return(
+            <AuthContext.Provider value={ {username, isAuthenticated, login, logout, token } }>
+                {children} 
+            </AuthContext.Provider>
+        )
+    }
+    ```
+    
+
+### Axios Interceptor
+
+- As we can see that now our AuthContext gives out token as well, and we want to use this token in our application so that our components can call rest apis.
+- So since we have 2 api files in our project right now, we would create a separate apiClient file
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20119.png)
+    
+- Now we want that anytime an api is called with this apiClient, the token is passed. Which means everytime the api is requested we want the Authorization header to take the token value in it.
+- For that we can add the interceptors() function present in axios, which would intercept every api call and then set the Authorization header as token. We need to pass the token only when the login is successful, and our login logic is present in AuthContext
+    
+    ```jsx
+    apiClient.interceptors.request.use(
+                        (config) => {
+                            console.log('intercepting and adding a token')
+                            config.headers.Authorization = baToken
+                            return config
+                        }
+                    )
+    ```
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20120.png)
+    
+- And now whenever we call an api from any component, if the apiClient is same then the response would be returned
+    
+    ![image.png](/images/React%20with%20SpringBoot/image%20121.png)
