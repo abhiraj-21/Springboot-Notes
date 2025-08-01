@@ -527,3 +527,163 @@ record JwtResponse(String token) {}
 - 
     
     ![image.png](/images/Spring%20Security/image%2035.png)
+    
+
+# Spring Security Authorization
+
+- There are two ways for authorization in Spring security:
+    - Global Security
+    - Method Security
+
+## Global Security
+
+- We use this in our SpringSecurityFilterChain, where we use the requestMatcher() method for checking authority.
+    
+    ![image.png](/images/Spring%20Security/image%2036.png)
+    
+
+## Method Security
+
+- We use this in our method which is called when a particular url is called. For eg: We want that only the user which has “USER” role can access the “/users/{username}/todos” url. Then we would add the method security over that method.
+- There are 2 annotation used for this @PreAuthorize and @PostAuthorize
+- @PreAuthorize
+    
+    ![image.png](/images/Spring%20Security/image%2037.png)
+    
+- @PostAuthorize
+    
+    ![image.png](/images/Spring%20Security/image%2038.png)
+    
+
+### JSR-250 Annotations
+
+- You can also use method security using JSR-250, but first you would have to enable it using
+    
+    ```java
+    @EnableMethodSecurity(jsr250Enabled = true)
+    ```
+    
+    In our Spring Security Configuration Bean
+    
+    ![image.png](/images/Spring%20Security/image%2039.png)
+    
+- Now we can use the @RolesAllowed to allow specific roles over a method
+    
+    ![image.png](/images/Spring%20Security/image%2040.png)
+    
+
+- We should also use @Secured with @RolesAllowed, it is the traditional spring security way to check Authority. One thing to note is that, “USER” and “ADMIN” are roles not authority, and if we want to check them using @Secured then we must use “ROLE_USER” and “ROLE_ADMIN”
+- To use @Secured we need to enable it the same way we did for jsr250
+    
+    ![image.png](/images/Spring%20Security/image%2041.png)
+    
+    ![image.png](/images/Spring%20Security/image%2042.png)
+    
+
+- The recommended approach to Authorize our application is using @PreAuthorize and @PostAuthorize
+
+ 
+
+# OAuth
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2043.png)
+    
+
+- We must add OAuth2 Client in our application during initializing since we want to make a link between our Resource Server and Client Application
+    
+    ![image.png](/images/Spring%20Security/image%2044.png)
+    
+    Here we would be creating a new project for learning OAuth2
+    
+- After creating the new project, if we go to the root link then we would see that we have the Spring Security Login page, but we want to login using OAuth2. So we would have to create a SecurityConfiguration class, and in the filter chain disable the login form.
+    
+    ![image.png](/images/Spring%20Security/image%2045.png)
+    
+    This would show an error
+    
+    ![image.png](/images/Spring%20Security/image%2046.png)
+    
+
+- To remove this error we can search Google API Console Developer, and then search credentials inside it
+    
+    ![image.png](/images/Spring%20Security/image%2047.png)
+    
+    ![image.png](/images/Spring%20Security/image%2048.png)
+    
+    Now we would be asked to configure consent screen. 
+    
+    ![image.png](/images/Spring%20Security/image%2049.png)
+    
+    And now we can create an OAuth Client ID 
+    
+    ![image.png](/images/Spring%20Security/image%2050.png)
+    
+    It is very important to add an Authorized redirect URIs, and if you are hosting the application locally on your machine then you have to use this 
+    
+    ```xml
+    http://localhost:8080/login/oauth2/code/google
+    ```
+    
+    ![image.png](/images/Spring%20Security/image%2051.png)
+    
+    And then finally we would have the OAuth client Id and secret which we can use in our application 
+    
+    ![Screenshot 2025-08-01 121115.png](/images/Spring%20Security/Screenshot_2025-08-01_121115.png)
+    
+
+- To use this Client Id and Client Secret, you would have to add these in your [application.properties](http://application.properties)
+    
+    ```xml
+    spring.security.oauth2.client.registration.google.client-id=YOUR_CLIENT_ID
+    spring.security.oauth2.client.registration.google.client-secret=YOUR_SECRET
+    ```
+    
+
+- And now if we go to [localhost:8080/login](http://localhost:8080/login) instead of seeing a spring security login form, we would see a Login with OAuth2 form
+    
+    ![image.png](/images/Spring%20Security/image%2052.png)
+    
+
+- Now, if we make a page for root application, then as soon as we login using our gmail account we would be redirected to it
+    
+    ![image.png](/images/Spring%20Security/image%2053.png)
+    
+    ![image.png](/images/Spring%20Security/image%2054.png)
+    
+    ![image.png](/images/Spring%20Security/image%2055.png)
+    
+
+- Now, we can access multiple information about the user who logged in. We know that once a user is authenticated, its information is stored in the Authentication class object. We could pass this object as parameter in our method, and access multiple information
+    
+    ![image.png](/images/Spring%20Security/image%2056.png)
+    
+    This information is only the information which we allowed the scopes for while creating the OAuth client 
+    
+
+# Spring Security Overview
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2057.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2058.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2059.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2060.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2061.png)
