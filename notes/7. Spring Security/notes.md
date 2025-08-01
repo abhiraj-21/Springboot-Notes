@@ -582,6 +582,24 @@ record JwtResponse(String token) {}
 
 - The recommended approach to Authorize our application is using @PreAuthorize and @PostAuthorize
 
+# OAuth
+
+    ![image.png](/images/OAuth/1.png)
+
+    ![image.png](/images/OAuth/2.png)
+
+    ![image.png](/images/OAuth/3.png)
+    
+    ![image.png](/images/OAuth/4.png)
+    
+    ![image.png](/images/OAuth/5.png)
+    
+    ![image.png](/images/OAuth/6.png)
+    
+    ![image.png](/images/OAuth/7.png)
+    
+    ![image.png](/images/OAuth/8.png)
+
 # Spring Security Overview
 
 - 
