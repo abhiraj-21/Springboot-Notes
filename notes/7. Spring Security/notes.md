@@ -527,3 +527,101 @@ record JwtResponse(String token) {}
 - 
     
     ![image.png](/images/Spring%20Security/image%2035.png)
+    
+
+# Spring Security Authorization
+
+- There are two ways for authorization in Spring security:
+    - Global Security
+    - Method Security
+
+## Global Security
+
+- We use this in our SpringSecurityFilterChain, where we use the requestMatcher() method for checking authority.
+    
+    ![image.png](/images/Spring%20Security/image%2036.png)
+    
+
+## Method Security
+
+- We use this in our method which is called when a particular url is called. For eg: We want that only the user which has “USER” role can access the “/users/{username}/todos” url. Then we would add the method security over that method.
+- There are 2 annotation used for this @PreAuthorize and @PostAuthorize
+- @PreAuthorize
+    
+    ![image.png](/images/Spring%20Security/image%2037.png)
+    
+- @PostAuthorize
+    
+    ![image.png](/images/Spring%20Security/image%2038.png)
+    
+
+### JSR-250 Annotations
+
+- You can also use method security using JSR-250, but first you would have to enable it using
+    
+    ```java
+    @EnableMethodSecurity(jsr250Enabled = true)
+    ```
+    
+    In our Spring Security Configuration Bean
+    
+    ![image.png](/images/Spring%20Security/image%2039.png)
+    
+- Now we can use the @RolesAllowed to allow specific roles over a method
+    
+    ![image.png](/images/Spring%20Security/image%2040.png)
+    
+
+- We should also use @Secured with @RolesAllowed, it is the traditional spring security way to check Authority. One thing to note is that, “USER” and “ADMIN” are roles not authority, and if we want to check them using @Secured then we must use “ROLE_USER” and “ROLE_ADMIN”
+- To use @Secured we need to enable it the same way we did for jsr250
+    
+    ![image.png](/images/Spring%20Security/image%2041.png)
+    
+    ![image.png](/images/Spring%20Security/image%2042.png)
+    
+
+- The recommended approach to Authorize our application is using @PreAuthorize and @PostAuthorize
+
+# OAuth
+
+    ![image.png](/images/OAuth/1.png)
+
+    ![image.png](/images/OAuth/2.png)
+
+    ![image.png](/images/OAuth/3.png)
+    
+    ![image.png](/images/OAuth/4.png)
+    
+    ![image.png](/images/OAuth/5.png)
+    
+    ![image.png](/images/OAuth/6.png)
+    
+    ![image.png](/images/OAuth/7.png)
+    
+    ![image.png](/images/OAuth/8.png)
+
+# Spring Security Overview
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2057.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2058.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2059.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2060.png)
+    
+
+- 
+    
+    ![image.png](/images/Spring%20Security/image%2061.png)
